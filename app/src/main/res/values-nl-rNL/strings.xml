@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LocationAwareApp</string>
+    <string name="title_activity_map">Map</string>
+    <string name="transport_choice">Kies u manier van vervoer</string>
+    <string name="walking">Lopend</string>
+    <string name="cycling">Fietsend</string>
+    <string name="driving">Rijdend</string>
+    <string name="start_map">Ga naar map</string>
+</resources>

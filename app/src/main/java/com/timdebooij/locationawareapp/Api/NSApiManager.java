@@ -1,4 +1,4 @@
-package com.timdebooij.locationawareapp;
+package com.timdebooij.locationawareapp.Api;
 
 import android.content.Context;
 import android.util.Log;
@@ -7,11 +7,11 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.timdebooij.locationawareapp.Api.NSApiListener;
+import com.timdebooij.locationawareapp.Entities.Station;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,7 +20,9 @@ import android.util.Base64;
 import org.json.XML;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -39,8 +41,8 @@ public class NSApiManager {
         this.gson = new Gson();
     }
 
-    public void getTimes(){
-        String url = "https://webservices.ns.nl/ns-api-avt?station=ut";
+    public void getTimes(String station){
+        String url = "https://webservices.ns.nl/ns-api-avt?station=" + station;
 
         StringRequest request = new StringRequest(0, url, new Response.Listener<String>() {
             @Override
@@ -85,24 +87,32 @@ public class NSApiManager {
 
     public void getStations(){
         String url = "http://webservices.ns.nl/ns-api-stations-v2?_ga=2.884721.199041428.1544620328-659085999.1544620328";
+        Log.i("info", "reached");
         StringRequest request = new StringRequest(0, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
 
 
                 try {
+                    List<Station> stationList = new ArrayList<>();
                     JSONObject object = XML.toJSONObject(response);
                     JSONObject stations = object.getJSONObject("Stations");
                     JSONArray stationArray = stations.getJSONArray("Station");
-                    for(int i = 9; i<stationArray.length(); i++){
+                    for(int i = 0; i<stationArray.length(); i++){
                         JSONObject station = stationArray.getJSONObject(i);
                         JSONObject names = station.getJSONObject("Namen");
                         String name = names.getString("Lang");
-                        Log.i("info", "name: " + name);
+                        double lon = station.getDouble("Lon");
+                        double lat = station.getDouble("Lat");
+                        int uid = station.getInt("UICCode");
+                        Station s = new Station(uid,name, lon,lat);
+                        stationList.add(s);
                     }
-                    //Log.i("info", object.toString());
+                    Log.i("info", "amount of stations before sending: " + stationList.size());
+                    listener.onStationsAvailable(stationList);
                 } catch (JSONException e) {
                     e.printStackTrace();
+
                 }
 
             }

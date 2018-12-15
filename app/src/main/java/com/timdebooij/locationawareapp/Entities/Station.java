@@ -3,9 +3,11 @@ package com.timdebooij.locationawareapp.Entities;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 @Entity
-public class Station {
+public class Station implements Parcelable {
 
     @PrimaryKey(autoGenerate = true)
     private int uid;
@@ -17,6 +19,13 @@ public class Station {
     @ColumnInfo(name = "station_lat")
     private double latitude;
 
+
+    protected Station(Parcel in){
+        name = in.readString();
+        longitude = in.readDouble();
+        latitude = in.readDouble();
+
+    }
     public Station(int uid,String name, double longitude, double latitude) {
         this.uid = uid;
         this.name = name;
@@ -27,6 +36,18 @@ public class Station {
     public Station(){
 
     }
+
+    public static final Creator<Station> CREATOR = new Creator<Station>() {
+        @Override
+        public Station createFromParcel(Parcel in) {
+            return new Station(in);
+        }
+
+        @Override
+        public Station[] newArray(int size) {
+            return new Station[size];
+        }
+    };
 
     public int getUid() {
         return uid;
@@ -58,5 +79,17 @@ public class Station {
 
     public void setLatitude(double latitude) {
         this.latitude = latitude;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(name);
+        parcel.writeDouble(longitude);
+        parcel.writeDouble(latitude);
     }
 }

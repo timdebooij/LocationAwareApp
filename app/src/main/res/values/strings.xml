@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">LocationAwareApp</string>
+    <string name="title_activity_map">Map</string>
+    <string name="transport_choice">Choose your way of transportation</string>
+    <string name="walking">Walking</string>
+    <string name="cycling">Cycling</string>
+    <string name="driving">Driving</string>
+    <string name="start_map">Go to map</string>
 </resources>

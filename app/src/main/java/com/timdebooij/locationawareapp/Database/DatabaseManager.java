@@ -35,7 +35,7 @@ public class DatabaseManager {
     }
 
     public void AddStation(Station station) {
-        database.daoAccess().AddAll(station);
+        database.daoAccess().insertStation(station);
     }
 
     public void clearDatabase() {
