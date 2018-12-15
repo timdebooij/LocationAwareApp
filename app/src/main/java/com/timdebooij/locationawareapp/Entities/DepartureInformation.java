@@ -24,7 +24,9 @@ public class DepartureInformation {
     public String getTime(){
         String[] parts = departureTime.split("T");
         String[] timeParts = parts[1].split("\\+");
-        return timeParts[0];
+        int index = timeParts[0].lastIndexOf(":");
+
+        return timeParts[0].substring(0,index);
     }
 
     @Override

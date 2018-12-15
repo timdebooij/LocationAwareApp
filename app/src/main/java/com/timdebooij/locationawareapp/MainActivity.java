@@ -30,10 +30,7 @@ import java.util.List;
 
 /*
 To do:
-        make start screen with information to choose transport and optional other information
-
-        mainscreen make spinner for all station in the region and make the spinner also settable by clicking on markers
-        Logic for getting times for each of the stations (without travel time)in a recyclerview.
+        Possibility to view detail of the departureinformation and mayby trainstation(distance in km for example)
         Button to make route to selected station and update the time list to only trains you can make.
  */
 
@@ -146,11 +143,11 @@ public class MainActivity extends AppCompatActivity implements NSApiListener {
         ut.setLongitude(5.104480);
         Location myLoc = startListening(stations);
         Log.i("info", "location: " + myLoc.getLatitude() + " + " + myLoc.getLongitude());
-        ArrayList<Station> stationClose = getClosestStations(stations, ut);
+        ArrayList<Station> stationClose = getClosestStations(stations, myLoc);
         Intent intent = new Intent(view.getContext(), MainScreen.class);
         intent.putParcelableArrayListExtra("stations", stationClose);
-        intent.putExtra("lat", ut.getLatitude());
-        intent.putExtra("lon", ut.getLongitude());
+        intent.putExtra("lat", myLoc.getLatitude());
+        intent.putExtra("lon", myLoc.getLongitude());
         intent.putExtra("transport", wayOfTransport);
         view.getContext().startActivity(intent);
     }

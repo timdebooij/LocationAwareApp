@@ -6,4 +6,5 @@
     <string name="cycling">Cycling</string>
     <string name="driving">Driving</string>
     <string name="start_map">Go to map</string>
+    <string name="track">Track: </string>
 </resources>

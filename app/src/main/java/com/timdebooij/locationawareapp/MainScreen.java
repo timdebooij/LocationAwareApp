@@ -14,6 +14,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -55,11 +57,15 @@ public class MainScreen extends  FragmentActivity implements NSApiListener {
     private String wayOfTransport;
     public ArrayAdapter<String> spinnerAdapter;
     private Spinner spinner;
+    private RecyclerView recyclerView;
+    private InformationAdapter adapter;
+    private ArrayList<DepartureInformation> departureInformation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
+        departureInformation = new ArrayList<>();
         nsApiManager = new NSApiManager(this,this);
         Intent intent = getIntent();
         this.manager = new DirectionApiManager(this, this);
@@ -153,6 +159,16 @@ public class MainScreen extends  FragmentActivity implements NSApiListener {
         spinnerAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item, names);
         spinner.setAdapter(spinnerAdapter);
         spinnerAdapter.notifyDataSetChanged();
+        setUpRecyclerView();
+    }
+
+    public void setUpRecyclerView(){
+        recyclerView = ((Fragment)getSupportFragmentManager().findFragmentById(R.id.informationFragment)).getView().findViewById(R.id.informationRecyclerView);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new InformationAdapter(this, departureInformation);
+        recyclerView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
     }
 
     public void mapButton(View view){
@@ -262,13 +278,9 @@ public class MainScreen extends  FragmentActivity implements NSApiListener {
 
     @Override
     public void onTimeAvailable(ArrayList<DepartureInformation> departureInformations) {
-        TextView test = ((Fragment)getSupportFragmentManager().findFragmentById(R.id.informationFragment)).getView().findViewById(R.id.testApiCallTextView);;
-        String text = "";
-        for(DepartureInformation d : departureInformations){
-            text = text + "\n" + d.toString();
-            Log.i("info","reached");
-        }
-        test.setText(text);
+        departureInformation.clear();
+        departureInformation.addAll(departureInformations);
+        adapter.notifyDataSetChanged();
     }
 
     @Override

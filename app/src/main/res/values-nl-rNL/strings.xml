@@ -7,4 +7,5 @@
     <string name="cycling">Fietsend</string>
     <string name="driving">Rijdend</string>
     <string name="start_map">Ga naar map</string>
+    <string name="track">"Spoor: "</string>
 </resources>
