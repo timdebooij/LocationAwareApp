@@ -4,22 +4,29 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.model.DirectionsLeg;
@@ -29,6 +36,8 @@ import com.google.maps.model.DirectionsStep;
 import com.google.maps.model.EncodedPolyline;
 import com.timdebooij.locationawareapp.Api.DirectionApiManager;
 import com.timdebooij.locationawareapp.Api.NSApiListener;
+import com.timdebooij.locationawareapp.Api.NSApiManager;
+import com.timdebooij.locationawareapp.Entities.DepartureInformation;
 import com.timdebooij.locationawareapp.Entities.Station;
 
 import java.util.ArrayList;
@@ -40,17 +49,22 @@ public class MainScreen extends  FragmentActivity implements NSApiListener {
     private LocationListener locationListener;
     public GoogleMap map;
     private DirectionApiManager manager;
+    private NSApiManager nsApiManager;
     private LatLng myLoc;
     private ArrayList<Station> stations;
     private String wayOfTransport;
+    public ArrayAdapter<String> spinnerAdapter;
+    private Spinner spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_screen);
+        nsApiManager = new NSApiManager(this,this);
         Intent intent = getIntent();
         this.manager = new DirectionApiManager(this, this);
         stations = intent.getParcelableArrayListExtra("stations");
+
         myLoc = new LatLng(intent.getDoubleExtra("lat", 0), intent.getDoubleExtra("lon", 0));
         this.wayOfTransport = intent.getStringExtra("transport");
         Log.i("info", wayOfTransport);
@@ -80,12 +94,21 @@ public class MainScreen extends  FragmentActivity implements NSApiListener {
             @Override
             public void onMapReady(GoogleMap googleMap) {
                 map = googleMap;
+                map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker) {
+                        String name = marker.getTitle();
+                        spinner.setSelection(spinnerAdapter.getPosition(name));
+                        return false;
+                    }
+                });
+                setUpSpinner();
                 startListening();
                 LatLng endpoint = new LatLng(51.5947713, 4.781993);
                 map.addMarker(new MarkerOptions().position(myLoc).title("My location"));
                 map.moveCamera(CameraUpdateFactory.newLatLng(myLoc));
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                        new LatLng(myLoc.latitude, myLoc.longitude), 16));
+                        new LatLng(myLoc.latitude, myLoc.longitude), 13));
 
                 for(Station s : stations){
                     LatLng statLoc = new LatLng(s.getLatitude(), s.getLongitude());
@@ -94,10 +117,55 @@ public class MainScreen extends  FragmentActivity implements NSApiListener {
 
             }
         });
+
+
+    }
+
+    public void setUpSpinner(){
+        ArrayList<String> names = new ArrayList<>();
+        for(Station s : stations){
+            names.add(s.getName());
+        }
+        spinner = ((Fragment)getSupportFragmentManager().findFragmentById(R.id.informationFragment)).getView().findViewById(R.id.stationSpinner);
+        spinner.getBackground().setColorFilter(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                String stat = spinner.getSelectedItem().toString();
+                double lat = 0;
+                double lon = 0;
+                for(Station s : stations){
+                    if(stat.equals(s.getName())){
+                        lat = s.getLatitude();
+                        lon = s.getLongitude();
+                    }
+                }
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                        new LatLng(lat, lon), 15));
+                nsApiManager.getTimes(stat);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+        spinnerAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item, names);
+        spinner.setAdapter(spinnerAdapter);
+        spinnerAdapter.notifyDataSetChanged();
     }
 
     public void mapButton(View view){
-        manager.getRoute(new LatLng(myLoc.latitude, myLoc.longitude), new LatLng(stations.get(0).getLatitude(), stations.get(0).getLongitude()), wayOfTransport);
+        String stat = spinner.getSelectedItem().toString();
+        double lat = 0;
+        double lon = 0;
+        for(Station s : stations){
+            if(stat.equals(s.getName())){
+                lat = s.getLatitude();
+                lon = s.getLongitude();
+            }
+        }
+        manager.getRoute(new LatLng(myLoc.latitude, myLoc.longitude), new LatLng(lat, lon), wayOfTransport);
     }
 
     public void startListening(){
@@ -193,8 +261,14 @@ public class MainScreen extends  FragmentActivity implements NSApiListener {
     }
 
     @Override
-    public void onTimeAvailable(String time) {
-
+    public void onTimeAvailable(ArrayList<DepartureInformation> departureInformations) {
+        TextView test = ((Fragment)getSupportFragmentManager().findFragmentById(R.id.informationFragment)).getView().findViewById(R.id.testApiCallTextView);;
+        String text = "";
+        for(DepartureInformation d : departureInformations){
+            text = text + "\n" + d.toString();
+            Log.i("info","reached");
+        }
+        test.setText(text);
     }
 
     @Override
@@ -206,4 +280,5 @@ public class MainScreen extends  FragmentActivity implements NSApiListener {
     public void onRouteAvailable(DirectionsResult directionsResult) {
         makeRoute(directionsResult);
     }
+
 }

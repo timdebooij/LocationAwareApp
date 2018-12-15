@@ -10,7 +10,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.timdebooij.locationawareapp.Api.NSApiListener;
+import com.timdebooij.locationawareapp.Entities.DepartureInformation;
 import com.timdebooij.locationawareapp.Entities.Station;
 
 import org.json.JSONArray;
@@ -44,23 +46,54 @@ public class NSApiManager {
     public void getTimes(String station){
         String url = "https://webservices.ns.nl/ns-api-avt?station=" + station;
 
+        ArrayList<DepartureInformation> departureInformation = new ArrayList<>();
         StringRequest request = new StringRequest(0, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
 
-
+                Log.i("infores", "length of response " + response.length());
+                //Log.i("infores", "response before: " + response);
+                String res = response;
+                if(res.length() > 12000){
+                    String check = "<VertrekkendeTrein>";
+                    int index = res.lastIndexOf(check);
+                    Log.i("infores", "index: " + index);
+                    res = res.substring(0, index);
+                    Log.i("infores","length after " + res.length());
+                }
                 try {
                     JSONObject object = XML.toJSONObject(response);
+                    Log.i("infores", "reached");
                     JSONObject dispatchTimes = object.getJSONObject("ActueleVertrekTijden");
                     JSONArray trains = dispatchTimes.getJSONArray("VertrekkendeTrein");
+
                     for(int i = 0; i<trains.length(); i++){
                         JSONObject train = trains.getJSONObject(i);
                         String endStation = train.getString("EindBestemming");
-                        Log.i("traininfo", "endStation: " + endStation);
+                        int number = train.getInt("RitNummer");
+                        String time = train.getString("VertrekTijd");
+                        String delay = "";
+                        if(train.has("VertrekVertragingTekst")) {
+                            delay = train.getString("VertrekVertragingTekst");
+                        }
+                        String sort = train.getString("TreinSoort");
+                        String carrier = train.getString("Vervoerder");
+                        JSONObject trackobject = train.getJSONObject("VertrekSpoor");
+                        int track = trackobject.getInt("content");
+                        String route = "";
+                        if(train.has("RouteTekst")){
+                            route = train.getString("RouteTekst");
+                        }
+                        DepartureInformation dep = new DepartureInformation(number, time, delay, endStation, route, sort,carrier, track);
+                        departureInformation.add(dep);
+
                     }
-                    Log.i("info", object.toString());
+                    listener.onTimeAvailable(departureInformation);
+                    //Log.i("info", object.toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    listener.onTimeAvailable(departureInformation);
+                    Log.i("info", e.getMessage());
                 }
 
             }

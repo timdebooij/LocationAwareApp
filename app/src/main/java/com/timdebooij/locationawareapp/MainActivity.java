@@ -21,6 +21,7 @@ import com.google.maps.model.DirectionsResult;
 import com.timdebooij.locationawareapp.Api.NSApiListener;
 import com.timdebooij.locationawareapp.Api.NSApiManager;
 import com.timdebooij.locationawareapp.Database.DatabaseManager;
+import com.timdebooij.locationawareapp.Entities.DepartureInformation;
 import com.timdebooij.locationawareapp.Entities.Station;
 
 import java.util.ArrayList;
@@ -141,21 +142,21 @@ public class MainActivity extends AppCompatActivity implements NSApiListener {
 
     public void clickNext(View view){
         Location ut = new Location("");
-        ut.setLatitude(51.58307);
-        ut.setLongitude(4.7769505);
+        ut.setLatitude(52.092876);
+        ut.setLongitude(5.104480);
         Location myLoc = startListening(stations);
         Log.i("info", "location: " + myLoc.getLatitude() + " + " + myLoc.getLongitude());
-        ArrayList<Station> stationClose = getClosestStations(stations, myLoc);
+        ArrayList<Station> stationClose = getClosestStations(stations, ut);
         Intent intent = new Intent(view.getContext(), MainScreen.class);
         intent.putParcelableArrayListExtra("stations", stationClose);
-        intent.putExtra("lat", myLoc.getLatitude());
-        intent.putExtra("lon", myLoc.getLongitude());
+        intent.putExtra("lat", ut.getLatitude());
+        intent.putExtra("lon", ut.getLongitude());
         intent.putExtra("transport", wayOfTransport);
         view.getContext().startActivity(intent);
     }
 
     @Override
-    public void onTimeAvailable(String time) {
+    public void onTimeAvailable(ArrayList<DepartureInformation> departureInformations) {
 
     }
 
