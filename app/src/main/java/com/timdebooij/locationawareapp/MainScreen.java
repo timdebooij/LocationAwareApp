@@ -71,6 +71,7 @@ public class MainScreen extends  FragmentActivity implements NSApiListener {
         this.manager = new DirectionApiManager(this, this);
         stations = intent.getParcelableArrayListExtra("stations");
 
+        setUpRecyclerView();
         myLoc = new LatLng(intent.getDoubleExtra("lat", 0), intent.getDoubleExtra("lon", 0));
         this.wayOfTransport = intent.getStringExtra("transport");
         Log.i("info", wayOfTransport);
@@ -159,7 +160,7 @@ public class MainScreen extends  FragmentActivity implements NSApiListener {
         spinnerAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item, names);
         spinner.setAdapter(spinnerAdapter);
         spinnerAdapter.notifyDataSetChanged();
-        setUpRecyclerView();
+
     }
 
     public void setUpRecyclerView(){

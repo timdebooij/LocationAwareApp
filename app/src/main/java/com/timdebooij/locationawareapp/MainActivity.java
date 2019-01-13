@@ -56,9 +56,10 @@ public class MainActivity extends AppCompatActivity implements NSApiListener {
         databaseManager.setDatabase(this);
         stations = new ArrayList<>();
         stations = databaseManager.getStations();
-        Log.i("info", "aantal stations bij opstart: " + stations.size());
+        Log.i("infostart", "aantal stations bij opstart: " + stations.size());
         if(!(stations.size() > 0)){
             manager.getStations();
+            Log.i("infostart", "executed");
         }
         this.locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
         //startListening(stations);
@@ -93,6 +94,7 @@ public class MainActivity extends AppCompatActivity implements NSApiListener {
         double lon = location.getLongitude();
         double closest = 100;
         Station sclose = null;
+        Log.i("infoStations", "amount of stations: " + stations.size());
         ArrayList<Station> sList = new ArrayList<>();
         for(Station s : stations){
             double dif = Math.abs(lat - s.getLatitude()) + Math.abs(lon - s.getLongitude());

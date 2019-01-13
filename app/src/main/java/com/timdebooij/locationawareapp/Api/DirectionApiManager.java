@@ -39,7 +39,7 @@ public class DirectionApiManager {
     public void getRoute(LatLng origin, LatLng destination, String transport)
     {
         String url = "https://maps.moviecast.io/directions?origin=" + origin.latitude + "," + origin.longitude +
-                "&destination=" + destination.latitude + "," + destination.longitude + "&mode=" + transport + "&key=d314dcbd-9358-4e95-96e2-14e9b29f7e5f";
+                "&destination=" + destination.latitude + "," + destination.longitude + "&mode=" + transport + "&key=1030a017-840a-423d-8ae7-e20ef8e9bed9";
 
         //String url2 = "https://maps.moviecast.io/directions?origin=Disneyland&destination=Universal+Studios+Hollywood&key=d314dcbd-9358-4e95-96e2-14e9b29f7e5f";
 

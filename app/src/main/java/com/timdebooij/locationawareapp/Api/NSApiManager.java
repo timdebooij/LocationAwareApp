@@ -152,7 +152,7 @@ public class NSApiManager {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.i("info", "error");
+                Log.i("infoerror", error.toString());
             }
         }) {
             @Override
