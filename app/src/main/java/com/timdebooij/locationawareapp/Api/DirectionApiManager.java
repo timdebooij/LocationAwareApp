@@ -67,10 +67,17 @@ public class DirectionApiManager {
 
                             List<LatLng> ll = decodePoly(pointline);
 
-
+                            int seconds = 0;
                             DirectionsRoute[] routes = new DirectionsRoute[routeArray.length()];
                             for(int i = 0; i<routeArray.length(); i++){
                                 routes[i] =  gson.fromJson(routeArray.get(i).toString(), DirectionsRoute.class);
+                                JSONObject duration = (JSONObject) routeArray.get(i);
+                                JSONArray legs = duration.getJSONArray("legs");
+                                JSONObject dur = legs.getJSONObject(0);
+                                JSONObject obj = dur.getJSONObject("duration");
+                                seconds = obj.getInt("value");
+
+                                //long length = dur.getLong("")
                             }
                             GeocodedWaypoint[] waypoints = new GeocodedWaypoint[geoCodeArray.length()];
                             for(int i = 0; i<geoCodeArray.length(); i++){
@@ -78,7 +85,7 @@ public class DirectionApiManager {
                             }
                             directionsResult.geocodedWaypoints = waypoints;
                             directionsResult.routes = routes;
-                            directionsApiListener.onRouteAvailable(directionsResult);
+                            directionsApiListener.onRouteAvailable(directionsResult, seconds);
 
                         }
                         catch (JSONException e)

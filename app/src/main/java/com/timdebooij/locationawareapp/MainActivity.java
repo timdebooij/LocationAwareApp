@@ -56,7 +56,6 @@ public class MainActivity extends AppCompatActivity implements NSApiListener {
         databaseManager.setDatabase(this);
         stations = new ArrayList<>();
         stations = databaseManager.getStations();
-        Log.i("infostart", "aantal stations bij opstart: " + stations.size());
         if(!(stations.size() > 0)){
             manager.getStations();
             Log.i("infostart", "executed");
@@ -79,7 +78,9 @@ public class MainActivity extends AppCompatActivity implements NSApiListener {
                 //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
                 Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 if(location != null) {
+                    Log.i("infoloc", "my location: " + location);
                     return location;
+
                 }
             }
         }
@@ -94,7 +95,6 @@ public class MainActivity extends AppCompatActivity implements NSApiListener {
         double lon = location.getLongitude();
         double closest = 100;
         Station sclose = null;
-        Log.i("infoStations", "amount of stations: " + stations.size());
         ArrayList<Station> sList = new ArrayList<>();
         for(Station s : stations){
             double dif = Math.abs(lat - s.getLatitude()) + Math.abs(lon - s.getLongitude());
@@ -108,17 +108,14 @@ public class MainActivity extends AppCompatActivity implements NSApiListener {
                 st.setLongitude(s.getLongitude());
                 st.setLatitude(s.getLatitude());
                 int distanceInMeters =  (int)(Math.floor(st.distanceTo(location)));
-                Log.i("info", "close station: " + s.getName() + " with " + distanceInMeters + " meter distance and " + dif);
             }
         }
         if(sList.size()==0){
             sList.add(sclose);
         }
-        Log.i("info", "closest station is: " + sclose.getName() + " at " + closest);
         for(Station s : sList) {
 
         }
-        Log.i("info", "amount of stations in area: " + sList.size());
         return sList;
     }
 
@@ -144,7 +141,6 @@ public class MainActivity extends AppCompatActivity implements NSApiListener {
         ut.setLatitude(52.092876);
         ut.setLongitude(5.104480);
         Location myLoc = startListening(stations);
-        Log.i("info", "location: " + myLoc.getLatitude() + " + " + myLoc.getLongitude());
         ArrayList<Station> stationClose = getClosestStations(stations, myLoc);
         Intent intent = new Intent(view.getContext(), MainScreen.class);
         intent.putParcelableArrayListExtra("stations", stationClose);
@@ -166,11 +162,10 @@ public class MainActivity extends AppCompatActivity implements NSApiListener {
         }
         List<Station> stationsCheck = new ArrayList<>();
         stationsCheck = databaseManager.getStations();
-        Log.i("info", "aantal stations na ophalen: " + stationsCheck.size());
     }
 
     @Override
-    public void onRouteAvailable(DirectionsResult directionsResult) {
+    public void onRouteAvailable(DirectionsResult directionsResult, int seconds) {
 
     }
 }

@@ -34,7 +34,7 @@ public class InformationAdapter extends RecyclerView.Adapter<InformationAdapter.
         DepartureInformation dep = departureInformation.get(position);
         holder.time.setText(dep.getTime());
         holder.endstation.setText(dep.endStation);
-        holder.stops.append(dep.stopStations);
+        holder.stops.setText("via: " + dep.stopStations);
         holder.delay.setText(dep.departureDelay);
         holder.track.setText("Track: " + dep.departureTrack);
     }

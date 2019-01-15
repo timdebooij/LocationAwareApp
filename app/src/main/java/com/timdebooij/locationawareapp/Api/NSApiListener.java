@@ -11,5 +11,5 @@ public interface NSApiListener {
 
     void onTimeAvailable(ArrayList<DepartureInformation> departureInformations);
     void onStationsAvailable(List<Station> stations);
-    void onRouteAvailable(DirectionsResult directionsResult);
+    void onRouteAvailable(DirectionsResult directionsResult, int seconds);
 }

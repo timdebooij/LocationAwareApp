@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,18 +29,20 @@ import com.google.android.gms.maps.model.LatLng;
 public class FragmentMap extends MapFragment {
 
     private LocationRequest mLocationRequest;
+    private Location myLocation;
 
-    private long UPDATE_INTERVAL = 10 * 1000;
+    private long UPDATE_INTERVAL = 10 * 100;
     private long FASTEST_INTERVAL = 2000;
 
     public FragmentMap() {
-
+        startLocationUpdates();
+        Log.i("infoloc", "location updates started");
     }
 
     @Override
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
-        startLocationUpdates();
+
     }
 
     protected void startLocationUpdates() {
@@ -68,6 +71,7 @@ public class FragmentMap extends MapFragment {
                    @Override
                     public void onLocationResult(LocationResult locationResult) {
                         onLocationChanged(locationResult.getLastLocation());
+                        Log.i("infoloc", "new location result");
                     }
                 },
                 Looper.myLooper());
