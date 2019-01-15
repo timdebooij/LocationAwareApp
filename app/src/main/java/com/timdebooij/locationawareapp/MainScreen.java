@@ -349,6 +349,9 @@ public class MainScreen extends  FragmentActivity implements NSApiListener {
         //Draw the polyline
         if (path.size() > 0)
         {
+            if(polyline!= null){
+                polyline.remove();
+            }
             routePath = path;
             PolylineOptions opts = new PolylineOptions().addAll(path).color(Color.BLUE).width(8);
             polyline = map.addPolyline(opts);
