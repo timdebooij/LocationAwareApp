@@ -3,6 +3,7 @@ package com.timdebooij.locationawareapp;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -42,6 +43,11 @@ public class MainActivity extends AppCompatActivity implements NSApiListener {
     private List<Station> stations;
     private String wayOfTransport = "walking";
 
+    public static final String SHARED_PREFS = "sharedPrefs";
+    public static final String WAY_OF_TRANSPORT = "wayoftransport";
+
+    private String prefText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements NSApiListener {
         //startListening(stations);
 
         //manager.getTimes();
+        loadData();
+        updatePreferenceData();
     }
 
     public Location startListening(List<Station> stations){
@@ -145,6 +153,9 @@ public class MainActivity extends AppCompatActivity implements NSApiListener {
         ut.setLongitude(5.104480);
         Location myLoc = startListening(stations);
         Log.i("info", "location: " + myLoc.getLatitude() + " + " + myLoc.getLongitude());
+
+        saveData();
+
         ArrayList<Station> stationClose = getClosestStations(stations, myLoc);
         Intent intent = new Intent(view.getContext(), MainScreen.class);
         intent.putParcelableArrayListExtra("stations", stationClose);
@@ -172,5 +183,27 @@ public class MainActivity extends AppCompatActivity implements NSApiListener {
     @Override
     public void onRouteAvailable(DirectionsResult directionsResult) {
 
+    }
+
+    public void saveData(){
+        TextView text = findViewById(R.id.transportInformationTextView);
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.clear();
+
+        editor.putString(WAY_OF_TRANSPORT,text.getText().toString());
+
+        editor.apply();
+    }
+
+    public void loadData(){
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        prefText = sharedPreferences.getString(WAY_OF_TRANSPORT,"");
+    }
+
+    public void updatePreferenceData(){
+        TextView transportinfo = findViewById(R.id.transportInformationTextView);
+        transportinfo.setText(prefText);
     }
 }
